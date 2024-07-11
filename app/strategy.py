@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from app.models import Output
+from app.models import Output, Block
 
 
 class BaseStrategy(ABC):
@@ -8,9 +8,12 @@ class BaseStrategy(ABC):
 
 
 class ConcreteStrategy(BaseStrategy):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, block: Block) -> None:
+        self.block = block
+        # get the openai endpont here
 
-    async def run(self, output_space: dict[str, Output]) -> Output:
+    async def run(self, output_space: dict[str, Output]) -> None:
         # use the async stuff for openai endpoinds
-        return super().run(output_space)
+        output_space[self.block.name] = Output()
+        # also report your process somewhere!!!
+        # like a notification api

@@ -4,7 +4,7 @@ from enum import Enum
 
 class Output(BaseModel):
     generated_by: str
-    payload: dict
+    content: dict
 
 
 class StrategyEnum(str, Enum):
@@ -14,6 +14,7 @@ class StrategyEnum(str, Enum):
 class Block(BaseModel):
     name: str
     strategy: StrategyEnum
+    metadata: dict
     upstream_blocks: list[str]
 
 

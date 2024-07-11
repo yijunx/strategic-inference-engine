@@ -1,5 +1,5 @@
 from app.strategy import ConcreteStrategy, BaseStrategy
-from app.models import Dag, StrategyEnum, Block
+from app.models import Dag, StrategyEnum, Block, Output
 
 
 strategy_enum_to_strategy_mapping: dict[StrategyEnum, BaseStrategy] = {
@@ -41,9 +41,15 @@ def plan(dag: Dag) -> list[Block]:
     return queue
 
 
-def execute(queue: list[Block]):
+def execute(queue: list[Block]) -> Output:
     output_space = {}
     for block in queue:
         s = strategy_enum_to_strategy_mapping[block.strategy]
         s.run(output_space=output_space)
+    return output_space[queue[-1].name]
+
+
+def process_dag(dag: Dag) -> Output:
+    queue = plan(dag)
+    return execute(queue)
 

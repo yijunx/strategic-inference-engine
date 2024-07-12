@@ -5,6 +5,7 @@ import asyncio
 strategy_enum_to_strategy_mapping: dict[StrategyEnum, BaseStrategy] = {
     StrategyEnum.concrete: ConcreteStrategy(
         # here you may init with openai keys
+        # or other stuff
     )
 }
 
@@ -12,27 +13,27 @@ strategy_enum_to_strategy_mapping: dict[StrategyEnum, BaseStrategy] = {
 def plan(dag: Dag) -> list[list[Block]]:
     block_dict = {}
     queue = []
-    while len(queue) < len(dag.blocks):
+    while len(queue) < len(dag.task_definition):
         batch_block = []
-        for block in dag.blocks:
-            if block.name in block_dict:
+        for b_id, block in dag.task_definition.items():
+            if b_id in block_dict:
                 # we have arranged this guy
                 ...
             else:
-                if block.upstream_blocks:
+                if block.upstream_block_ids:
                     can_add = True
-                    for upstream_block_name in block.upstream_blocks:
-                        if upstream_block_name in block_dict:
+                    for upstream_block_id in block.upstream_block_ids:
+                        if upstream_block_id in block_dict:
                             ...
                         else:
                             can_add = False
                     if can_add:
                         batch_block.append(block)
-                        block_dict[block.name] = block
+                        block_dict[block.id] = block
                 else:
                     # no upstream, just add
                     batch_block.append(block)
-                    block_dict[block.name] = block
+                    block_dict[block.id] = block
         if len(batch_block) == 0:
             # nothing changes ths round
             break
@@ -58,6 +59,8 @@ def execute(queue: list[list[Block]]) -> Output:
             execute_strategies(output_space=output_space, strategies=strategies)
         )
     # last layer block has to be only one, to be our only output
+    # actually return here is not important
+    # we should send notification throughout the execution
     return output_space[queue[-1][0].name]
 
 
